@@ -9,7 +9,10 @@ from sqlalchemy.orm import (Session, sessionmaker)
 from src.db.orm_models import Base, UserORM
 from src.game import (ConnectionManager, Game, Player,
                       PlayerOptions, Room, RoomManager)
-from src.models import UserModel
+
+from src.db.db import DB
+from src.models import CreateUserRequest, ErrorResponse
+from src.errors import UserNotFoundError
 
 app = FastAPI()
 
@@ -29,6 +32,15 @@ TIME_TO_THINK = 10
 
 manager = ConnectionManager()
 room_manager = RoomManager()
+
+engine = create_engine(
+    'postgresql+psycopg://postgres:qwerty@localhost/postgres', 
+    echo=True,
+    pool_size=5,
+    max_overflow=10,
+)
+
+db = DB(engine)
 
 
 @app.websocket("/ws/{client_id}")
@@ -85,25 +97,22 @@ async def websocket_endpoint(websocket: WebSocket, client_id: int):
         # оповестить другого игрока
      
 
-engine = create_engine(
-    'postgresql+psycopg://postgres:qwerty@localhost/postgres', 
-    echo=True,
-    pool_size=5,
-    max_overflow=10,
-)
-
-metadata = MetaData()
 
 
-
-Base.metadata.create_all(engine)
-Session = sessionmaker(engine)
-session = Session()
 
 @app.get("/rating")
-async def get():
-    users = session.query(UserORM).all()
-    usersDTO = [UserModel.model_validate(user).model_dump_json() for user in users]
-    print(json.dumps(usersDTO))
+async def rating():
+    users_rated = db.get_rating()
+
+    return JSONResponse(json.dumps(users_rated))
+
+@app.post("/users/create")
+async def create_user(request: CreateUserRequest):
+    try:
+        db.create_user(request.username, request.password)
+        return JSONResponse('{}')
+    except UserNotFoundError as e:
+        return JSONResponse(json.dumps(e.message), status_code=400)
+
+
     
-    return JSONResponse(json.dumps(usersDTO))

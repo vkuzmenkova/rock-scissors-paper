@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import axios from 'axios'
 
 // defineProps({
@@ -25,8 +25,6 @@ axios({
   .finally(function () {
   });
 
-
-
 </script>
 
 <template>
@@ -36,6 +34,7 @@ axios({
     </caption>
     <thead>
       <tr>
+        <th>#</th>
         <th scope="col">Username</th>
         <th scope="col">Total</th>
         <th scope="col">Wins</th>
@@ -44,7 +43,8 @@ axios({
       </tr>
     </thead>
     <tbody>
-      <tr v-for="user in users">
+      <tr v-for="(user, index) in users">
+        <td>{{index+1}}</td>
         <th scope="row">{{user.username }}</th>
         <td>{{user.total}}</td> 
         <td>{{user.wins}}</td>
