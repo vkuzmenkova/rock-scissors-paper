@@ -1,16 +1,16 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
-import GamePlay from './components/GamePlay.vue'
-import LeaderBoard from './components/LeaderBoard.vue'
 </script>
 
 <template>
   <header>
-      <GamePlay/>
-      <LeaderBoard/>
+      <main>
+        <RouterView />
+      </main>
       <nav>
+        <RouterLink to="/auth">Create user / Login</RouterLink>
         <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
+        <RouterLink to="/leaderboard">Leaderboard</RouterLink>
       </nav>
   </header>     
 </template>

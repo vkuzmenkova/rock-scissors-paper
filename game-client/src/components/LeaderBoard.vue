@@ -15,8 +15,8 @@ axios({
   url: 'http://127.0.0.1:8000/rating',
 })
   .then(function (response) {
-    users = JSON.parse(response.data)
-    users = users.map(user=>JSON.parse(user))
+    users.value = JSON.parse(response.data)
+    users.value = users.value.map(user=>JSON.parse(user))
     console.log(users)  
   })
   .catch(function (error) {
@@ -48,7 +48,7 @@ axios({
         <th scope="row">{{user.username }}</th>
         <td>{{user.total}}</td> 
         <td>{{user.wins}}</td>
-        <td>{{user.wins}}</td>
+        <td>{{user.total - user.wins}}</td>
         <td>{{user.wins/user.total * 100}}</td>
       </tr>
     </tbody>
