@@ -1,0 +1,24 @@
+local:
+  server:
+    host: localhost
+    port: 8080
+  db:
+    driver: postgresql+psycopg
+    host: localhost
+    port: 5432
+    name: postgres
+    user: postgres
+    password: qwerty
+    ssl_mode: disable
+container:
+  server:
+    host: app
+    port: 8080
+  db:
+    driver: postgresql+psycopg
+    host: postgres
+    port: 5432
+    name: postgres
+    user: postgres
+    password: qwerty
+    ssl_mode: disable

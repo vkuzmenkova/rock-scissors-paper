@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<table align="center">
+    <caption>
+      Leaderboard
+    </caption>
+    <thead>
+      <tr>
+        <th scope="col">Username</th>
+        <th scope="col">Total</th>
+        <th scope="col">Wins</th>
+        <th scope="col">% of wins</th>
+      </tr>
+    </thead>
+    <tbody>
+        {% for user in res %}
+        <tr>
+            <th scope="row">{{ user.username }}</th>
+            <td>{{user.total}}</td>
+            <td>{{user.wins}}</td>
+            <td>{{user.wins/user.total * 100}}</td>
+          </tr>
+        {% endfor %}
+    </tbody>
+  </table>
+
+{% endblock %}

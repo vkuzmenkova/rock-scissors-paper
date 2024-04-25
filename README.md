@@ -1,2 +1,10 @@
 # rock-scissors-paper
- rock-scissors-paper game: Flask + Vue + PostgreSQL + Docker
+ rock-scissors-paper game: FASTapi + Vue + PostgreSQL + Docker
+
+ DB scheme
+Users
+ - uuid
+ - nickname
+ - passoword
+ - total
+ - wins

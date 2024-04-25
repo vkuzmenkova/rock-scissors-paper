@@ -1,0 +1,12 @@
+Flask==3.0.3
+flask_caching==2.1.0
+sqlalchemy==2.0.29
+psycopg==3.1.18
+pyyaml==6.0.1
+loguru==0.7.2
+alembic==1.13.1
+flask-cors==4.0.0
+websocket_client==1.7.0
+fastapi==0.110.2
+isort==5.13.2
+pylint-==3.1.0

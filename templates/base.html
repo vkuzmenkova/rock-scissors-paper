@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <link rel="stylesheet" href="{{url_for('static', filename='styles.css')}}">
+    <!--<script type="text/javascript" src="{{url_for('static', filename='main.js')}}">-->
+    </script>
+    <title>Rock-Paper-Scissors</title>
+</head>
+<body>
+        <!-- {% block content %}
+        {% endblock %} -->
+
+    <div id="app">
+        <button @click="count++">
+            Count is: <div>{{ 0 }}</div>
+        </button>
+    </div>
+
+    <script src="https://unpkg.com/vue@next">
+        import { createApp, ref } from 'vue'
+
+        createApp({
+            setup() {
+                return {
+                    count: ref(0)
+                }
+            }
+        }).mount('#app')
+    </script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
+</body>
+</html>
