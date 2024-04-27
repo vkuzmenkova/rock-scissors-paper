@@ -2,12 +2,13 @@
 import { ref } from 'vue'
 import axios from 'axios'
 
-// defineProps({
-//   username: {
-//     type: String,
-//     required: true
-//   }
-// })
+
+defineProps({
+  username: {
+    type: String,
+    required: true
+  }
+})
 let users = ref([])
 
 axios({
@@ -28,6 +29,7 @@ axios({
 </script>
 
 <template>
+  <p align="right">{{ username }}</p>
   <table align="center">
     <caption>
       Leader Board
@@ -43,9 +45,9 @@ axios({
       </tr>
     </thead>
     <tbody>
-      <tr v-for="(user, index) in users">
+      <tr v-for="(user, index) in users" :class="{ bold: username === user.username}" >
         <td>{{index+1}}</td>
-        <td>{{user.username }}</td>
+        <td>{{user.username}}</td>
         <td>{{user.total}}</td> 
         <td>{{user.wins}}</td>
         <td>{{user.total - user.wins}}</td>
@@ -56,6 +58,11 @@ axios({
 </template>
 
 <style scoped>
+.bold{
+  font-weight: bold;
+  background-color: pink;
+}
+
 table {
   table-layout: fixed;
   width: 100%;
@@ -73,8 +80,7 @@ th {
   font-weight: bold;
 }
 
-.header {
 
-}
+
 
 </style>

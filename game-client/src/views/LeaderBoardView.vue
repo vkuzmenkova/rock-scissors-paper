@@ -14,7 +14,7 @@ export default {
 
 
 <template>
-  <LeaderBoard/>
+  <LeaderBoard username="wooster"/>
 </template>
 
 <style>

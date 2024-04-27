@@ -12,7 +12,7 @@ from src.game import (ConnectionManager, Game, Player,
 
 from src.db.db import DB
 from src.models import CreateUserRequest
-from src.errors import UserNotFoundError
+from src.errors import UserNotFoundError, UserAlreadyExists, WrongPassword
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
 app = FastAPI()
@@ -82,7 +82,7 @@ async def websocket_endpoint(websocket: WebSocket, client_id: int):
 
             # Waiting for the choice if both are ready
             choice = await websocket.receive_text()
-            
+
             if choice == "ONE_MORE":
                 player.ready = True
                 if playing_room.are_players_ready() is True:
@@ -120,12 +120,17 @@ async def create_user(request: CreateUserRequest):
     try:
         db.create_user(request.username, request.password)
         return JSONResponse('{}')
-    except UserNotFoundError as e:
+    except UserAlreadyExists as e:
         return JSONResponse(json.dumps(e.message), status_code=400)
 
 
 @app.post("/auth/login")
 async def login(request: CreateUserRequest):
-    pass
-
+    try:
+        db.login(request.username, request.password)
+        return JSONResponse('{}')
+    except UserNotFoundError as e:
+        return JSONResponse(json.dumps(e.message), status_code=400)
+    except WrongPassword as e: 
+        return JSONResponse(json.dumps(e.message), status_code=401)
     

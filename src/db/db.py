@@ -5,7 +5,7 @@ from src.models import User
 import json
 import uuid as pyuuid
 
-from src.errors import UserNotFoundError
+from src.errors import UserNotFoundError, UserAlreadyExists, WrongPassword
 
 class DB:
     def __init__(self, engine):
@@ -34,7 +34,15 @@ class DB:
             self.session.add(user)
             self.session.commit()
         else:
-            raise UserNotFoundError(f"User `{username}` already exists")    
+            raise UserAlreadyExists(f"User `{username}` already exists")    
 
     def find_by_username(self, username: str):
         return self.session.query(UserORM).filter(UserORM.username == username).one_or_none()
+    
+    def login(self, username: str, password: str):
+        user = self.find_by_username(username)
+        if user is None:
+            raise UserNotFoundError(f"User `{username}` not found")
+        elif user.password != password: 
+            raise WrongPassword(f"Wrong password for user `{username}`")
+

@@ -1,11 +1,12 @@
 <script setup>
 import { ref } from 'vue'
-// defineProps({
-//   id: {
-//     type: Number,
-//     required: true
-//   }
-// })
+
+defineProps({
+  username: {
+    type: String,
+    required: true
+  }
+})
 
 const clientID = Date.now() 
 const ws = new WebSocket(`ws://localhost:8000/ws/${clientID}`);
@@ -112,6 +113,7 @@ function oneMore(event){
 </script>
 
 <template>
+  <p align="right">{{ username }}</p>
   <div align="center" class="status">{{ status }}</div>
     <div v-if="isChoicesShown" class="choices">
         <button :disabled=areChoicesDisabled id="rockButton" @click="sendRock"><img src="./icons/rock.svg" alt="Icon" class="icon">Rock</button>

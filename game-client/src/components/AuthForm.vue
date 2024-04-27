@@ -26,6 +26,28 @@ function createUser(event) {
     })
   } 
 }
+
+function login(event) {
+  if (username.value && password.value){
+    axios({
+      method: 'post',
+      url: 'http://127.0.0.1:8000/auth/login',
+      data: {
+        username: username.value.toLowerCase(),
+        password: password.value,
+      },
+    })
+      .then(function (response) {
+        console.log(response.data)
+        message.value = `You logged in as "${username.value}"`
+      })
+      .catch(function (error, response) {
+        console.log(error);
+        message.value = error.response.data;
+    })
+  } 
+}
+
 </script>
 
 
@@ -42,7 +64,7 @@ function createUser(event) {
         </div>
         <button type="submit" @click="createUser">Create user</button>
         <p align="center">or</p>
-        <button type="submit" @click="">Login</button>
+        <button type="submit" @click="login">Login</button>
       </form>
       <p>{{ message }}</p>
     </div>
