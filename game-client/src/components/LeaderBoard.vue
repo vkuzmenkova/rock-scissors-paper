@@ -45,11 +45,11 @@ axios({
     <tbody>
       <tr v-for="(user, index) in users">
         <td>{{index+1}}</td>
-        <th scope="row">{{user.username }}</th>
+        <td>{{user.username }}</td>
         <td>{{user.total}}</td> 
         <td>{{user.wins}}</td>
         <td>{{user.total - user.wins}}</td>
-        <td>{{user.wins/user.total * 100}}</td>
+        <td>{{!isNaN(user.wins/user.total * 100) ? user.wins/user.total * 100 : 0}}</td>
       </tr>
     </tbody>
   </table>
@@ -63,8 +63,18 @@ table {
   border-spacing: 0px;
   border: 3px solid purple;
 }
-td, th {
+td {
   border: 1px solid black;
+  text-align: center;
+}
+
+th {
+  border: 1px solid black;
+  font-weight: bold;
+}
+
+.header {
+
 }
 
 </style>

@@ -13,6 +13,7 @@ class PlayerOptions(Enum):
     PAPER = 3
 
 class GameStatus(Enum):
+    WAITING = 0
     CREATED = 1
     IN_PROGRESS = 2
     FINISHED = 3
@@ -73,6 +74,7 @@ class Player:
         self.websocket = ws
         self.id = id
         self.choice = None
+        self.ready: bool = False
 
         logger.debug(f"Client #{id} created")
 
@@ -113,13 +115,14 @@ class Room:
             logger.debug(f"Player #{player_id} removed from the room #{self.id}.")
             return
         
+    
     async def announce_result(self, result: Result):
         if result is Result.PLAYER1_WON:
-            await self.player1.websocket.send_text(f"Player #2: {self.game.p2_option.name}. You: {self.game.p1_option.name}. You win!")
-            await self.player2.websocket.send_text(f"Player #1: {self.game.p1_option.name}. You: {self.game.p2_option.name}.You lose!")
+            await self.player1.websocket.send_text(f"Other player: {self.game.p2_option.name}. You: {self.game.p1_option.name}. You win!")
+            await self.player2.websocket.send_text(f"Other player: {self.game.p1_option.name}. You: {self.game.p2_option.name}.You lose!")
         elif result is Result.PLAYER2_WON:
-            await self.player1.websocket.send_text(f"Player #2: {self.game.p2_option.name}. You: {self.game.p1_option.name}.You lose!")
-            await self.player2.websocket.send_text(f"Player #1: {self.game.p1_option.name}. You: {self.game.p2_option.name}.You win!")
+            await self.player1.websocket.send_text(f"Other player: {self.game.p2_option.name}. You: {self.game.p1_option.name}.You lose!")
+            await self.player2.websocket.send_text(f"Other player: {self.game.p1_option.name}. You: {self.game.p2_option.name}.You win!")
         else:
             await self.broadcast("It's a tie!")
 
@@ -128,6 +131,11 @@ class Room:
     def set_default(self):
         self.player1.choice = None
         self.player2.choice = None
+        self.player1.ready = False
+        self.player2.ready = False
+    
+    def are_players_ready(self):
+        return self.player1.ready and self.player2.ready
     
     async def countdown(self, seconds: int):
         while seconds > 0:

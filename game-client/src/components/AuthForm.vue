@@ -12,7 +12,7 @@ function createUser(event) {
       method: 'post',
       url: 'http://127.0.0.1:8000/users/create',
       data: {
-        username: username.value,
+        username: username.value.toLowerCase(),
         password: password.value,
       },
     })
@@ -41,6 +41,8 @@ function createUser(event) {
           <input v-model="password" placeholder="password" required>
         </div>
         <button type="submit" @click="createUser">Create user</button>
+        <p align="center">or</p>
+        <button type="submit" @click="">Login</button>
       </form>
       <p>{{ message }}</p>
     </div>

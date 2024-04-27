@@ -8,11 +8,12 @@ from sqlalchemy.orm import (Session, sessionmaker)
 
 from src.db.orm_models import Base, UserORM
 from src.game import (ConnectionManager, Game, Player,
-                      PlayerOptions, Room, RoomManager)
+                      PlayerOptions, Room, RoomManager, GameStatus)
 
 from src.db.db import DB
-from src.models import CreateUserRequest, ErrorResponse
+from src.models import CreateUserRequest
 from src.errors import UserNotFoundError
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 
 app = FastAPI()
 
@@ -27,6 +28,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 TIME_TO_THINK = 10
 
@@ -51,47 +53,54 @@ async def websocket_endpoint(websocket: WebSocket, client_id: int):
     player = Player(ws=websocket, id=client_id)
     playing_room = None
 
-    # Pick the room to attach player
-    waiting_room = room_manager.get_waiting_room()
-    if waiting_room is None:
-        room = Room()
-        room.add_player(player)
-        room_manager.add_room(room)
-        playing_room = room
-
-        await websocket.send_text("Waiting for another player ...")
-    else:
-        playing_room = waiting_room
-        
-        playing_room.add_player(player)
-        playing_room.game = Game()
-        await playing_room.broadcast("Let's play!")
 
     try:
         while True:
-            # task_countdown = asyncio.create_task(playing_room.countdown(TIME_TO_THINK))
-            # task_choice = asyncio.create_task(websocket.receive_text())
-            # choice, pending = await asyncio.wait([task_countdown, task_choice], return_when=asyncio.FIRST_COMPLETED)
-            # for task in pending:
-            #     task.cancel()
+            # If user already in a room
+            if playing_room is not None and playing_room.is_player_here(player.id):
+                pass
+            else:
+                # Find a vacant room and attach player
+                waiting_room = room_manager.get_waiting_room()
+                # If all rooms are nont vacant
+                if waiting_room is None:
+                    room = Room()
+                    room.add_player(player)
+                    room_manager.add_room(room)
+                    playing_room = room
+                    player.ready = True
 
+                    await websocket.send_text(GameStatus.WAITING.name)
+                # Attach user to the room
+                else:
+                    playing_room = waiting_room
+                    
+                    playing_room.add_player(player)
+                    player.ready = True
+                    playing_room.game = Game()
+                    await playing_room.broadcast(GameStatus.CREATED.name)
+
+            # Waiting for the choice if both are ready
             choice = await websocket.receive_text()
-            player.choice = PlayerOptions[choice]
             
-            if playing_room.player1.choice is not None and playing_room.player2.choice is not None:
-                # переписать
-                playing_room.game.p1_option = playing_room.player1.choice
-                playing_room.game.p2_option = playing_room.player2.choice
-                result = playing_room.game.find_winner()
+            if choice == "ONE_MORE":
+                player.ready = True
+                if playing_room.are_players_ready() is True:
+                    await playing_room.broadcast(GameStatus.CREATED.name)
+            else:
+                player.choice = PlayerOptions[choice]
+            
+                if playing_room.player1.choice is not None and playing_room.player2.choice is not None:
+                    playing_room.game.p1_option = playing_room.player1.choice
+                    playing_room.game.p2_option = playing_room.player2.choice
+                    result = playing_room.game.find_winner()
 
-                # перенести в room manager?
-                await playing_room.announce_result(result)
-
-                
+                    # перенести в room manager?
+                    await playing_room.announce_result(result)
 
     except WebSocketDisconnect:
         manager.disconnect(websocket)
-        await playing_room.send_message_to_another_player(player, "Waiting for another player ...")
+        await playing_room.send_message_to_another_player(player, GameStatus.WAITING.name)
         # remove user
         room_manager.remove_player(player.id)
         # оповестить другого игрока
@@ -114,5 +123,9 @@ async def create_user(request: CreateUserRequest):
     except UserNotFoundError as e:
         return JSONResponse(json.dumps(e.message), status_code=400)
 
+
+@app.post("/auth/login")
+async def login(request: CreateUserRequest):
+    pass
 
     
