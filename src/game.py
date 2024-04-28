@@ -70,13 +70,13 @@ class ConnectionManager:
 
 class Player:
     choice: PlayerOptions
-    def __init__(self, ws: WebSocket, id: int):
+    def __init__(self, ws: WebSocket, id: str):
         self.websocket = ws
         self.id = id
         self.choice = None
         self.ready: bool = False
 
-        logger.debug(f"Client #{id} created")
+        logger.debug(f"Player #{id} created")
 
 
 class Room:    
@@ -102,10 +102,10 @@ class Room:
 
         logger.debug(f"Player #{player.id} added to the room #{self.id}.")    
 
-    def is_player_here(self, player_id: int) -> bool:
+    def is_player_here(self, player_id: str) -> bool:
         return (self.player1 is not None and self.player1.id == player_id) or (self.player2 is not None and self.player2.id == player_id)
 
-    def remove_player(self, player_id: int):
+    def remove_player(self, player_id: str):
         if self.is_player_here(player_id):
             if self.player1.id == player_id:
                 self.player1 = None

@@ -45,12 +45,12 @@ engine = create_engine(
 db = DB(engine)
 
 
-@app.websocket("/ws/{client_id}")
-async def websocket_endpoint(websocket: WebSocket, client_id: int):
+@app.websocket("/ws/{username}")
+async def websocket_endpoint(websocket: WebSocket, username: str):
     await manager.connect(websocket)
 
     # Create player
-    player = Player(ws=websocket, id=client_id)
+    player = Player(ws=websocket, id=username)
     playing_room = None
 
 
@@ -97,13 +97,17 @@ async def websocket_endpoint(websocket: WebSocket, client_id: int):
 
                     # перенести в room manager?
                     await playing_room.announce_result(result)
+                    db.save_result(
+                        playing_room.player1.id,
+                        playing_room.player2.id,
+                        result,
+                    )
 
     except WebSocketDisconnect:
         manager.disconnect(websocket)
         await playing_room.send_message_to_another_player(player, GameStatus.WAITING.name)
         # remove user
         room_manager.remove_player(player.id)
-        # оповестить другого игрока
      
 
 

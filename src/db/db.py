@@ -6,6 +6,7 @@ import json
 import uuid as pyuuid
 
 from src.errors import UserNotFoundError, UserAlreadyExists, WrongPassword
+from src.game import Result
 
 class DB:
     def __init__(self, engine):
@@ -45,4 +46,21 @@ class DB:
             raise UserNotFoundError(f"User `{username}` not found")
         elif user.password != password: 
             raise WrongPassword(f"Wrong password for user `{username}`")
+    
+
+    def save_result(self, username1: str, username2: str, result: Result):
+        # updated_at
+        player1 = self.find_by_username(username1)
+        player2 = self.find_by_username(username2)
+
+        player1.total +=1
+        player2.total +=1
+
+        if result is Result.PLAYER1_WON:
+            player1.wins +=1
+        elif result is Result.PLAYER2_WON:
+            player2.wins +=1
+
+        self.session.add_all([player1, player2])
+        self.session.commit()
 

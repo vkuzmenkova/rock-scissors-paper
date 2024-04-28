@@ -54,7 +54,7 @@ axios({
         <td>{{user.total}}</td> 
         <td>{{user.wins}}</td>
         <td>{{user.total - user.wins}}</td>
-        <td>{{!isNaN(user.wins/user.total * 100) ? user.wins/user.total * 100 : 0}}</td>
+        <td>{{!isNaN(user.wins/user.total * 100) ? (user.wins/user.total * 100).toFixed(2) : 0}}</td>
       </tr>
     </tbody>
   </table>

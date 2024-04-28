@@ -11,8 +11,7 @@ defineProps({
 
 const usersStore = useUsersStore()
 
-const clientID = Date.now() 
-const ws = new WebSocket(`ws://localhost:8000/ws/${clientID}`);
+const ws = new WebSocket(`ws://localhost:8000/ws/${usersStore.userName}`);
 const timer_sec = 10
 const timer = ref(0)
 
