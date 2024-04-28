@@ -1,7 +1,9 @@
 <script setup>
 import { ref } from 'vue'
 import axios from 'axios'
+import { useUsersStore } from '../../store/users'
 
+const usersStore = useUsersStore()
 
 defineProps({
   username: {
@@ -18,10 +20,10 @@ axios({
   .then(function (response) {
     users.value = JSON.parse(response.data)
     users.value = users.value.map(user=>JSON.parse(user))
-    console.log(users)  
+    // console.log(users)  
   })
   .catch(function (error) {
-    console.log(error);
+    // console.log(error);
   })
   .finally(function () {
   });
@@ -29,7 +31,8 @@ axios({
 </script>
 
 <template>
-  <p align="right">{{ username }}</p>
+  <p v-if="usersStore.isLoggedIn" align="right">{{ usersStore.userName }}</p>
+  <!-- <p align="right">{{ username }}</p> -->
   <table align="center">
     <caption>
       Leader Board
@@ -45,7 +48,7 @@ axios({
       </tr>
     </thead>
     <tbody>
-      <tr v-for="(user, index) in users" :class="{ bold: username === user.username}" >
+      <tr v-for="(user, index) in users" :class="{ bold: user.username === usersStore.userName}" >
         <td>{{index+1}}</td>
         <td>{{user.username}}</td>
         <td>{{user.total}}</td> 
