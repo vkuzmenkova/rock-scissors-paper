@@ -3,3 +3,7 @@ migrations:
 
 lint: 
 	isort *
+
+start:
+	docker-compose up -d
+

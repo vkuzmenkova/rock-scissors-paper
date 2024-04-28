@@ -14,10 +14,15 @@ from src.db.db import DB
 from src.models import CreateUserRequest
 from src.errors import UserNotFoundError, UserAlreadyExists, WrongPassword
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+import os
 
 app = FastAPI()
 
+host = os.environ.get("HOST")
+db_host = os.environ.get("DB_HOST")
+
 origins = [
+    f"http://{host}:5173",
     "http://localhost:5173",
 ]
 
@@ -36,7 +41,7 @@ manager = ConnectionManager()
 room_manager = RoomManager()
 
 engine = create_engine(
-    'postgresql+psycopg://postgres:qwerty@localhost/postgres', 
+    f'postgresql+psycopg://postgres:qwerty@{db_host}/postgres', 
     echo=True,
     pool_size=5,
     max_overflow=10,
