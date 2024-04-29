@@ -43,7 +43,6 @@ ws.onmessage = function(event) {
       setTimer(timer_sec)
       break;
     default:
-      // results
       status.value=event.data;
 
       isOneMoreShown.value = true
@@ -70,7 +69,7 @@ function setTimer(sec) {
   timer.value = sec
   timerId.value = setInterval(() => {
       if (timer.value > 0) {
-        timer.value--; // уменьшаем значение таймера каждую секунду
+        timer.value--;
       } 
   }, 1000);
 

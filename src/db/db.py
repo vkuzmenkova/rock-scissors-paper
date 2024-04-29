@@ -1,12 +1,13 @@
-from sqlalchemy import MetaData, create_engine
-from sqlalchemy.orm import (Session, sessionmaker)
-from src.db.orm_models import Base, UserORM
-from src.models import User
-import json
 import uuid as pyuuid
 
-from src.errors import UserNotFoundError, UserAlreadyExists, WrongPassword
+from sqlalchemy import MetaData
+from sqlalchemy.orm import sessionmaker
+
+from src.db.orm_models import Base, UserORM
+from src.errors import UserAlreadyExists, UserNotFoundError, WrongPassword
 from src.game import Result
+from src.models import User
+
 
 class DB:
     def __init__(self, engine):
@@ -15,11 +16,9 @@ class DB:
         Session = sessionmaker(engine)
         self.session = Session()
 
-
     def get_rating(self) -> list[User]:
         users = self.session.query(UserORM).order_by(UserORM.wins.desc()).all()
         usersDTO: list[User] = [User.model_validate(user).model_dump_json() for user in users]        
-
         return usersDTO
     
     def create_user(self, username: str, password: str):
@@ -46,21 +45,19 @@ class DB:
             raise UserNotFoundError(f"User `{username}` not found")
         elif user.password != password: 
             raise WrongPassword(f"Wrong password for user `{username}`")
-    
 
     def save_result(self, username1: str, username2: str, result: Result):
         # updated_at
         player1 = self.find_by_username(username1)
         player2 = self.find_by_username(username2)
 
-        player1.total +=1
-        player2.total +=1
+        player1.total += 1
+        player2.total += 1
 
         if result is Result.PLAYER1_WON:
-            player1.wins +=1
+            player1.wins += 1
         elif result is Result.PLAYER2_WON:
-            player2.wins +=1
+            player2.wins += 1
 
         self.session.add_all([player1, player2])
         self.session.commit()
-

@@ -1,20 +1,16 @@
 import json
+import os
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from sqlalchemy import MetaData, create_engine
-from sqlalchemy.orm import (Session, sessionmaker)
-
-from src.db.orm_models import Base, UserORM
-from src.game import (ConnectionManager, Game, Player,
-                      PlayerOptions, Room, RoomManager, GameStatus)
+from sqlalchemy import create_engine
 
 from src.db.db import DB
+from src.errors import UserAlreadyExists, UserNotFoundError, WrongPassword
+from src.game import (ConnectionManager, Game, GameStatus, Player,
+                      PlayerOptions, Room, RoomManager)
 from src.models import CreateUserRequest
-from src.errors import UserNotFoundError, UserAlreadyExists, WrongPassword
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-import os
 
 app = FastAPI()
 
@@ -41,7 +37,7 @@ manager = ConnectionManager()
 room_manager = RoomManager()
 
 engine = create_engine(
-    f'postgresql+psycopg://postgres:qwerty@{db_host}/postgres', 
+    f'postgresql+psycopg://postgres:qwerty@{db_host}/postgres',
     echo=True,
     pool_size=5,
     max_overflow=10,
@@ -57,8 +53,7 @@ async def websocket_endpoint(websocket: WebSocket, username: str):
     # Create player
     player = Player(ws=websocket, id=username)
     playing_room = None
-
-
+    
     try:
         while True:
             # If user already in a room
@@ -100,7 +95,6 @@ async def websocket_endpoint(websocket: WebSocket, username: str):
                     playing_room.game.p2_option = playing_room.player2.choice
                     result = playing_room.game.find_winner()
 
-                    # перенести в room manager?
                     await playing_room.announce_result(result)
                     db.save_result(
                         playing_room.player1.id,
@@ -113,9 +107,6 @@ async def websocket_endpoint(websocket: WebSocket, username: str):
         await playing_room.send_message_to_another_player(player, GameStatus.WAITING.name)
         # remove user
         room_manager.remove_player(player.id)
-     
-
-
 
 
 @app.get("/rating")
@@ -123,6 +114,7 @@ async def rating():
     users_rated = db.get_rating()
 
     return JSONResponse(json.dumps(users_rated))
+
 
 @app.post("/users/create")
 async def create_user(request: CreateUserRequest):
@@ -140,6 +132,5 @@ async def login(request: CreateUserRequest):
         return JSONResponse('{}')
     except UserNotFoundError as e:
         return JSONResponse(json.dumps(e.message), status_code=400)
-    except WrongPassword as e: 
+    except WrongPassword as e:
         return JSONResponse(json.dumps(e.message), status_code=401)
-    

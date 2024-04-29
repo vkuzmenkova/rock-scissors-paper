@@ -3,7 +3,6 @@ import uuid as pyuuid
 from enum import Enum
 
 from fastapi import WebSocket
-from fastapi.responses import JSONResponse
 from loguru import logger
 
 
@@ -12,16 +11,19 @@ class PlayerOptions(Enum):
     SCISSORS = 2
     PAPER = 3
 
+
 class GameStatus(Enum):
     WAITING = 0
     CREATED = 1
     IN_PROGRESS = 2
     FINISHED = 3
 
+
 class Result(Enum):
     PLAYER1_WON = 1
     PLAYER2_WON = 2
     TIE = 3
+
 
 BEAT_RULES = {
     # choices: winner option
@@ -49,6 +51,7 @@ class Game:
         
         return Result.PLAYER2_WON    
 
+
 class ConnectionManager:
     def __init__(self):
         self.active_connections: list[WebSocket] = []
@@ -70,6 +73,7 @@ class ConnectionManager:
 
 class Player:
     choice: PlayerOptions
+    
     def __init__(self, ws: WebSocket, id: str):
         self.websocket = ws
         self.id = id
@@ -81,7 +85,7 @@ class Player:
 
 class Room:    
     def __init__(self):
-        self.id: pyuuid.UUID =  pyuuid.uuid4()
+        self.id: pyuuid.UUID = pyuuid.uuid4()
         self.player1: Player = None
         self.player2: Player = None
         self.game: Game = None
@@ -89,17 +93,16 @@ class Room:
         logger.debug(f"Room #{self.id} created.")
 
     def is_empty(self) -> bool:
-        return self.player1 == None and self.player2 == None
+        return self.player1 is None and self.player2 is None
     
     def is_waiting(self) -> bool:
-        return self.player1 == None or self.player2 == None and not self.is_empty()
+        return self.player1 is None or self.player2 is None and not self.is_empty()
     
     def add_player(self, player: Player):
         if self.is_empty():
             self.player1 = player
         else:
             self.player2 = player
-
         logger.debug(f"Player #{player.id} added to the room #{self.id}.")    
 
     def is_player_here(self, player_id: str) -> bool:
@@ -114,7 +117,6 @@ class Room:
             
             logger.debug(f"Player #{player_id} removed from the room #{self.id}.")
             return
-        
     
     async def announce_result(self, result: Result):
         if result is Result.PLAYER1_WON:
@@ -126,7 +128,7 @@ class Room:
         else:
             await self.broadcast("It's a tie!")
 
-        self.set_default()        
+        self.set_default()
 
     def set_default(self):
         self.player1.choice = None
@@ -145,7 +147,6 @@ class Room:
         await self.broadcast("Time off!")
     
     async def send_message_to_another_player(self, sender: Player, message: str):
-        #  переписать условия
         if sender is self.player1 and self.player1 is not None and self.player2 is not None:
             await self.player2.websocket.send_text(message)
         
@@ -154,7 +155,7 @@ class Room:
     
     async def broadcast(self, message: str):
         await self.player1.websocket.send_text(message) 
-        await self.player2.websocket.send_text(message)       
+        await self.player2.websocket.send_text(message)
 
 
 class RoomManager:
@@ -171,25 +172,15 @@ class RoomManager:
     def add_room(self, room: Room) -> None:
         self.rooms.append(room)
 
-    def remove_player(self, player_id:int):
-        # TODO: перегруппировать пользователей, если есть по одному игроку в комнате
-
+    def remove_player(self, player_id: int):
         for room in self.rooms:
             if room.is_player_here(player_id):
                 room.remove_player(player_id)
                 if room.is_empty():
                     self.remove_room(room)
-                return  
+                return
     
     def remove_room(self, room: Room):
-        # обработать ошибку
         self.rooms.remove(room)
         logger.debug(f"Room #{room.id} removed.")
-
-
-
-    
-
-    
-    
-
+        

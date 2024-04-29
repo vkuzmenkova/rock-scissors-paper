@@ -4,31 +4,8 @@ import { ref } from 'vue'
 import { useUsersStore } from '../../store/users'
 
 const usersStore = useUsersStore()
-
 const message=ref('')
-// const username=ref('')
 const password=ref('')
-
-// function createUser(event) {
-//   if (username.value && password.value){
-//     axios({
-//       method: 'post',
-//       url: 'http://127.0.0.1:8000/users/create',
-//       data: {
-//         username: username.value.toLowerCase(),
-//         password: password.value,
-//       },
-//     })
-//       .then(function (response) {
-//         console.log(response.data)
-//         message.value = `User "${username.value}" created`
-//       })
-//       .catch(function (error, response) {
-//         console.log(error);
-//         message.value = error.response.data;
-//     })
-//   } 
-// }
 
 function createUser(event) {
   if (usersStore.userName && password.value){
@@ -41,11 +18,9 @@ function createUser(event) {
       },
     })
       .then(function (response) {
-        // console.log(response.data)
         message.value = `User "${usersStore.userName}" created`
       })
       .catch(function (error, response) {
-        // console.log(error);
         message.value = error.response.data;
     })
   } 
@@ -62,37 +37,14 @@ function login(event) {
       },
     })
       .then(function (response) {
-        // console.log(response.data)
         message.value = `You logged in as "${usersStore.userName}"`
         usersStore.setIsLoggedIn(true)
       })
       .catch(function (error, response) {
-        // console.log(error);
         message.value = error.response.data;
     })
   } 
 }
-
-// function login(event) {
-//   if (username.value && password.value){
-//     axios({
-//       method: 'post',
-//       url: 'http://127.0.0.1:8000/auth/login',
-//       data: {
-//         username: username.value.toLowerCase(),
-//         password: password.value,
-//       },
-//     })
-//       .then(function (response) {
-//         console.log(response.data)
-//         message.value = `You logged in as "${username.value}"`
-//       })
-//       .catch(function (error, response) {
-//         console.log(error);
-//         message.value = error.response.data;
-//     })
-//   } 
-// }
 
 const handleChange = (event) => {
   usersStore.setUserName(event.target.value);
@@ -108,7 +60,6 @@ const handleChange = (event) => {
     <form @submit.prevent="onSubmit">
       <div class="form-group">
         <label>Username:</label>
-        <!-- <input v-model="username" placeholder="username" required> -->
         <input @input="handleChange" placeholder="username" required>
       </div>
       <div class="form-group">
@@ -124,24 +75,6 @@ const handleChange = (event) => {
 </div>
 </template>
 
-<!-- <template>
-    <div class="container">
-      <form @submit.prevent="onSubmit">
-        <div class="form-group">
-          <label>Username:</label>
-          <input v-model="username" placeholder="username" required>
-        </div>
-        <div class="form-group">
-          <label>Password:</label>
-          <input v-model="password" placeholder="password" required>
-        </div>
-        <button type="submit" @click="createUser">Create user</button>
-        <p align="center">or</p>
-        <button type="submit" @click="login">Login</button>
-      </form>
-      <p>{{ message }}</p>
-    </div>
-</template> -->
 
 <style scoped>
 .authForm {

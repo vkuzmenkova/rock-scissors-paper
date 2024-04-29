@@ -1,7 +1,7 @@
 import uuid as pyuuid
 
-from pydantic import BaseModel, ConfigDict, StringConstraints, TypeAdapter
-from typing_extensions import Annotated, List
+from pydantic import BaseModel, ConfigDict, StringConstraints
+from typing_extensions import Annotated
 
 
 class User(BaseModel):
@@ -13,7 +13,7 @@ class User(BaseModel):
     total: int
     wins: int 
 
+
 class CreateUserRequest(BaseModel):
     username: Annotated[str, StringConstraints(max_length=50)]
     password: Annotated[str, StringConstraints(max_length=50)]
-    

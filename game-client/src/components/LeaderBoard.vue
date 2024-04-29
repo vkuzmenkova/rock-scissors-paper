@@ -19,11 +19,9 @@ axios({
 })
   .then(function (response) {
     users.value = JSON.parse(response.data)
-    users.value = users.value.map(user=>JSON.parse(user))
-    // console.log(users)  
+    users.value = users.value.map(user=>JSON.parse(user))  
   })
   .catch(function (error) {
-    // console.log(error);
   })
   .finally(function () {
   });
@@ -32,7 +30,6 @@ axios({
 
 <template>
   <p v-if="usersStore.isLoggedIn" align="right">{{ usersStore.userName }}</p>
-  <!-- <p align="right">{{ username }}</p> -->
   <table align="center">
     <caption>
       Leader Board
@@ -82,8 +79,4 @@ th {
   border: 1px solid black;
   font-weight: bold;
 }
-
-
-
-
 </style>

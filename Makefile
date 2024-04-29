@@ -3,6 +3,8 @@ migrations:
 
 lint: 
 	isort *
+	flake8 --config flake8
+	
 
 start:
 	docker-compose up

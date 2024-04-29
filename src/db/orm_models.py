@@ -1,11 +1,11 @@
 import uuid as pyuuid
 
-from sqlalchemy.orm import (DeclarativeBase, Mapped, joinedload, mapped_column,
-                            relationship, scoped_session, sessionmaker)
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
 class Base(DeclarativeBase):
     pass
+
 
 class UserORM(Base):
     __tablename__ = 'users'
@@ -15,13 +15,3 @@ class UserORM(Base):
     password: Mapped[str]
     total: Mapped[int]
     wins: Mapped[int]
-
-# users_table = Table(
-#     'users',
-#     metadata,
-#     Column("uuid", UUID, primary_key=True),
-#     Column("username", String(50)),
-#     Column("password", String(50)),
-#     Column("total", Integer),
-#     Column("wins", Integer),
-# )

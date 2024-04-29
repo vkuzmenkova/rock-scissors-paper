@@ -6,7 +6,6 @@ import AuthFormView from '../views/AuthFormView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
-  // history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',

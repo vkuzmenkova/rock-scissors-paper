@@ -10,7 +10,6 @@ services:
   app:
     build: ./
     command: bash -c "./wait-for-postgres.sh db && uvicorn app:app --proxy-headers --host 0.0.0.0 --port 8000"
-      # - alembic upgrade head
     ports:
       - 8000:8000
     depends_on:
