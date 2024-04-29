@@ -4,7 +4,7 @@
 How to play:
 
 1. run `make start`
-2. go to  http://localhost:5317
+2. go to  http://localhost:5173/
 3. click on `Create user / Login`
 4. enter username and password and press `Create user`
 5. log in with created user
